@@ -1,0 +1,22 @@
+---
+
+- name: Common | Add rethinkdb apt repo
+  apt_repository:
+    repo="deb http://download.rethinkdb.com/apt {{ansible_lsb.codename}} main"
+    state="present"
+  register: apt_repo
+
+- name: Common | Add rethinkdb apt gpg
+  apt_key:
+    url="http://download.rethinkdb.com/apt/pubkey.gpg"
+    state="present"
+  register: apt_gpg
+
+- name: Common | Update apt after repo change
+  apt:
+    update_cache=yes
+  when: apt_gpg | changed or apt_repo | changed
+
+- name: Common | Install the rethinkdb package
+  apt:
+    name=rethinkdb
